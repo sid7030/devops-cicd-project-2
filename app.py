@@ -1,15 +1,10 @@
-from app import app
+from flask import Flask
 
+app = Flask(__name__)
 
-def test_home():
-    client = app.test_client()
-    response = client.get("/")
-    assert response.status_code == 200
-    assert b"Hello DevOps!" in response.data
+@app.route("/")
+def home():
+    return "Hello DevOps! CI/CD project 2 is running on AWS EC2."
 
-
-def test_health():
-    client = app.test_client()
-    response = client.get("/health")
-    assert response.status_code == 200
-    assert b"Application is healthy!" in response.data
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
