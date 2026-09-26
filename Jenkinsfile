@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'siddharthpingle7030/devops-cicd-project-2'
+        EC2_HOST = '44.214.181.34'
     }
 
     stages {
@@ -42,6 +43,16 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 bat 'docker push %DOCKER_IMAGE%:latest'
+            }
+        }
+
+        stage('Deploy to EC2') {
+            steps {
+                sshagent(['ec2-ssh-key']) {
+                    bat '''
+                        ssh -o StrictHostKeyChecking=no ubuntu@%EC2_HOST% "docker pull %DOCKER_IMAGE%:latest && docker stop devops-cicd-project-2 || true && docker rm devops-cicd-project-2 || true && docker run -d -p 5001:5000 --name devops-cicd-project-2 %DOCKER_IMAGE%:latest"
+                    '''
+                }
             }
         }
     }
